@@ -11,28 +11,24 @@ from openai import OpenAI
 from pinecone import Pinecone
 import uuid
 
-# Load API keys from environment (or set directly)
 os.environ["OPENAI_API_KEY"] = "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"
-os.environ["PINECONE_API_KEY"] = "pcsk_5tsJkP_uNsvdQ8DnawJypKfKzbxZRU1Cb5o4C2i392CYQDhX5jUdBJnPJtrwsFYrwCVMx" # Replace with your actual Pinecone API key
+os.environ["PINECONE_API_KEY"] = "pcsk_5tsJkP_uNsvdQ8DnawJypKfKzbxZRU1Cb5o4C2i392CYQDhX5jUdBJnPJtrwsFYrwCVMx"
 
 client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
 
-# Setup embeddings + vector store
 embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
 vectorstore = PineconeVectorStore.from_existing_index(
-    index_name="rag-assistant", # Ensure this Pinecone index name is correct
+    index_name="rag-assistant", 
     embedding=embeddings
 )
 
-# Page Config
 st.set_page_config(
     page_title="SingAI Unified Government Chatbot",
-    page_icon="🦁",
+    page_icon="",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
 
-# Initialize session state variables
 if 'conversation' not in st.session_state:
     st.session_state.conversation = []
 if 'input_key' not in st.session_state:
@@ -40,10 +36,9 @@ if 'input_key' not in st.session_state:
 if 'last_user_input_content' not in st.session_state:
     st.session_state.last_user_input_content = ""
 
-# --- Load and encode all images ---
 logo_base64 = ""
 try:
-    with open("logo.png", "rb") as img_file: # Assuming this is your small lion logo
+    with open("logo.png", "rb") as img_file:
         logo_base64 = base64.b64encode(img_file.read()).decode()
 except FileNotFoundError:
     st.warning("Logo file 'logo.png' not found. Please ensure it's in the same directory.")
@@ -52,7 +47,7 @@ except Exception as e:
 
 header_image_base64 = ""
 try:
-    with open("image_204982.png", "rb") as img_file: # "UNIFYING GOVERNMENT INTELLIGENCE" image
+    with open("image_204982.png", "rb") as img_file: 
         header_image_base64 = base64.b64encode(img_file.read()).decode()
 except FileNotFoundError:
     st.warning("Header image 'image_204982.png' not found. Please ensure it's in the same directory.")
@@ -61,14 +56,13 @@ except Exception as e:
 
 brain_image_base64 = ""
 try:
-    with open("image_204563.png", "rb") as img_file: # Brain image for background
+    with open("image_204563.png", "rb") as img_file:
         brain_image_base64 = base64.b64encode(img_file.read()).decode()
 except FileNotFoundError:
     st.warning("Brain image 'image_204563.png' not found. Please ensure it's in the same directory.")
 except Exception as e:
     st.error(f"Error loading brain image: {e}")
 
-# --- Custom CSS ---
 st.markdown(f"""
 <style>
     /* Main app styling with transparent brain image background */
@@ -94,12 +88,10 @@ st.markdown(f"""
         z-index: -1; /* Place it behind the main content */
     }}
 
-    /* Hide Streamlit branding */
     #MainMenu {{visibility: hidden;}}
     header {{visibility: hidden;}}
     footer {{visibility: hidden;}}
 
-    /* Chat container */
     .chat-container {{
         max-width: 950px;
         margin: auto;
@@ -120,7 +112,6 @@ st.markdown(f"""
         backdrop-filter: blur(10px);
     }}
 
-    /* Header */
     .chat-header {{
         background: linear-gradient(90deg, rgba(42, 64, 48, 0.4) 0%, rgba(26, 53, 53, 0.4) 100%);
         padding: 25px;
@@ -129,7 +120,6 @@ st.markdown(f"""
         position: relative;
     }}
 
-    /* New header image styling */
     .header-image {{
         max-width: 80%; /* Adjust size as needed */
         height: auto;
@@ -249,7 +239,7 @@ st.markdown(f"""
         /* 3D/inset shading */
         box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.4), /* Dark shadow for top-left (depth) */
                     inset -2px -2px 5px rgba(255, 255, 255, 0.1); /* Light shadow for bottom-right (highlight) */
-        caret-color: white !important; /* ✨ FIX FOR WHITE CURSOR ✨ */
+        caret-color: white !important; /*  FIX FOR WHITE CURSOR  */
     }}
 
     /* Fix for red border and enhanced 3D/glow on focus */
@@ -257,7 +247,7 @@ st.markdown(f"""
     .stTextInput > div > div > input:focus-visible, /* Target this specifically */
     .stTextInput > div > div > input:active {{ /* And this for good measure */
         border-color: rgba(64, 96, 64, 0.9) !important; /* Keeps the green border if you want it */
-        box-shadow: 0 0 30px rgba(255, 255, 255, 0.8), /* ✨ FIX FOR WHITE OUTER GLOW ON FOCUS ✨ */
+        box-shadow: 0 0 30px rgba(255, 255, 255, 0.8), /*  FIX FOR WHITE OUTER GLOW ON FOCUS ✨ */
                     inset 2px 2px 8px rgba(0, 0, 0, 0.6), /* Deeper dark inset */
                     inset -2px -2px 8px rgba(255, 255, 255, 0.15) !important; /* Brighter light inset */
         outline: none !important; /* Crucial for removing default outlines */
@@ -369,7 +359,6 @@ st.markdown(f"""
 </style>
 """, unsafe_allow_html=True)
 
-# --- Display small lion logo (fixed) ---
 if logo_base64:
     st.markdown(f"""
         <div class="logo-container">
@@ -377,20 +366,16 @@ if logo_base64:
         </div>
     """, unsafe_allow_html=True)
 
-# Main chat interface
 st.markdown('<div class="chat-container">', unsafe_allow_html=True)
 
-# --- Header with new image ---
 st.markdown(f"""
     <div class="chat-header">
         {'<img src="data:image/png;base64,' + header_image_base64 + '" class="header-image">' if header_image_base64 else '<h1 class="chat-title">SingAI Unified Government Chatbot</h1><p class="chat-subtitle">CPF • HDB • Singapore Public Policy</p>'}
     </div>
 """, unsafe_allow_html=True)
 
-# Messages display area
 st.markdown('<div class="messages-area">', unsafe_allow_html=True)
 
-# Display conversation or welcome message
 if not st.session_state.conversation:
     st.markdown("""
         <div class="welcome-message">
@@ -410,7 +395,6 @@ else:
 
 st.markdown('</div>', unsafe_allow_html=True)
 
-# Input area
 st.markdown('<div class="input-container">', unsafe_allow_html=True)
 
 user_input = st.text_input(
@@ -422,11 +406,9 @@ user_input = st.text_input(
 
 send_button = st.button("Send", key="send_button_fixed")
 
-st.markdown('</div>', unsafe_allow_html=True) # Close input-container
+st.markdown('</div>', unsafe_allow_html=True)
 
-# --- Handle User Message Logic ---
-# Check if send button is clicked OR if Enter key was pressed in the text input
-# This logic ensures the input clears and the message is processed.
+
 if send_button or (user_input and user_input.strip() != "" and user_input != st.session_state.last_user_input_content):
     if user_input.strip() != "":
         timestamp = datetime.now().strftime("%I:%M %p")
@@ -438,20 +420,16 @@ if send_button or (user_input and user_input.strip() != "" and user_input != st.
             "timestamp": timestamp
         })
 
-        # Add 'typing...' bubble
         st.session_state.conversation.append({
             "role": "bot",
             "content": '<div class="typing-dots"><span></span><span></span><span></span></div>',
             "timestamp": datetime.now().strftime("%I:%M %p")
         })
 
-        # Generate a new unique key for the text input to clear it
         st.session_state.input_key = str(uuid.uuid4())
-        # Reset last_user_input_content to allow new identical inputs after clearing
         st.session_state.last_user_input_content = ""
         st.rerun()
 
-# --- RAG Pipeline ---
 if st.session_state.conversation and st.session_state.conversation[-1]["role"] == "bot" and '<div class="typing-dots">' in st.session_state.conversation[-1]["content"]:
     user_msg = next((m["content"] for m in reversed(st.session_state.conversation) if m["role"] == "user"), "")
 
@@ -500,11 +478,9 @@ Answer:
     except Exception as e:
         answer = f"⚠️ Error generating response: {str(e)} Please try again or rephrase your question."
 
-    # Remove the typing indicator message
     if st.session_state.conversation and st.session_state.conversation[-1]["role"] == "bot" and '<div class="typing-dots">' in st.session_state.conversation[-1]["content"]:
         st.session_state.conversation.pop()
 
-    # Add the actual bot response
     st.session_state.conversation.append({
         "role": "bot",
         "content": answer,
@@ -512,7 +488,6 @@ Answer:
     })
     st.rerun()
 
-# Auto-scroll to bottom script (outside chat-container)
 st.markdown("""
 <script>
     const messagesArea = document.querySelector('.messages-area');
