@@ -1,3 +1,6 @@
+import subprocess
+subprocess.run(["pip", "install", "-r", "requirement.txt"])
+
 import streamlit as st
 import base64
 from datetime import datetime
