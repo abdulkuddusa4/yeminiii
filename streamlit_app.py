@@ -1,5 +1,5 @@
 import subprocess
-subprocess.run(["pip", "install", "-r", "requirement.txt"])
+subprocess.run(["pip", "install", "-r", "requirements.txt"])
 from dotenv import load_dotenv
 
 import streamlit as st
