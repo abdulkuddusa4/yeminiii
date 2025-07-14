@@ -15,8 +15,8 @@ import uuid
 
 # os.environ["OPENAI_API_KEY"] = "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"
 # os.environ["PINECONE_API_KEY"] = "pcsk_5tsJkP_uNsvdQ8DnawJypKfKzbxZRU1Cb5o4C2i392CYQDhX5jUdBJnPJtrwsFYrwCVMx"
-
-client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
+os.environ['PINECONE_API_KEY'] = st.secrets['PINECONE_API_KEY']
+client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
 embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
 vectorstore = PineconeVectorStore.from_existing_index(
