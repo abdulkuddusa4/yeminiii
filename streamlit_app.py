@@ -1,5 +1,7 @@
 import subprocess
 subprocess.run(["pip", "install", "-r", "requirement.txt"])
+from dotenv import load_dotenv
+load_dotenv()
 
 import streamlit as st
 import base64
@@ -10,6 +12,7 @@ from langchain_pinecone import PineconeVectorStore
 from openai import OpenAI
 from pinecone import Pinecone
 import uuid
+
 
 # os.environ["OPENAI_API_KEY"] = "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"
 # os.environ["PINECONE_API_KEY"] = "pcsk_5tsJkP_uNsvdQ8DnawJypKfKzbxZRU1Cb5o4C2i392CYQDhX5jUdBJnPJtrwsFYrwCVMx"
