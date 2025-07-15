@@ -10,6 +10,7 @@ import uuid
 
 
 client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
+os.environ['PINECONE_API_KEY'] = st.secrets['PINECONE_API_KEY']
 
 embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
 vectorstore = PineconeVectorStore.from_existing_index(
