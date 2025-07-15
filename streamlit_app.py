@@ -1,28 +1,24 @@
 import subprocess
-subprocess.run(["pip", "install", "-r", "requirements.txt"])
-from dotenv import load_dotenv
-
 import streamlit as st
 import base64
 from datetime import datetime
 import os
 from langchain_openai import OpenAIEmbeddings
 from langchain_pinecone import PineconeVectorStore
-from openai import OpenAI
-from pinecone import Pinecone
+from openai import OpenAI # Ensure this is imported
 import uuid
 
 
-# os.environ["OPENAI_API_KEY"] = "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"
-# os.environ["PINECONE_API_KEY"] = "pcsk_5tsJkP_uNsvdQ8DnawJypKfKzbxZRU1Cb5o4C2i392CYQDhX5jUdBJnPJtrwsFYrwCVMx"
-os.environ['PINECONE_API_KEY'] = st.secrets['PINECONE_API_KEY']
 client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
+
+
 
 embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
 vectorstore = PineconeVectorStore.from_existing_index(
-    index_name="rag-assistant", 
+    index_name="rag-assistant",
     embedding=embeddings
 )
+
 
 st.set_page_config(
     page_title="SingAI Unified Government Chatbot",
@@ -31,12 +27,14 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
+
 if 'conversation' not in st.session_state:
     st.session_state.conversation = []
 if 'input_key' not in st.session_state:
     st.session_state.input_key = str(uuid.uuid4())
 if 'last_user_input_content' not in st.session_state:
     st.session_state.last_user_input_content = ""
+
 
 logo_base64 = ""
 try:
@@ -49,7 +47,7 @@ except Exception as e:
 
 header_image_base64 = ""
 try:
-    with open("image_204982.png", "rb") as img_file: 
+    with open("image_204982.png", "rb") as img_file:
         header_image_base64 = base64.b64encode(img_file.read()).decode()
 except FileNotFoundError:
     st.warning("Header image 'image_204982.png' not found. Please ensure it's in the same directory.")
@@ -64,6 +62,8 @@ except FileNotFoundError:
     st.warning("Brain image 'image_204563.png' not found. Please ensure it's in the same directory.")
 except Exception as e:
     st.error(f"Error loading brain image: {e}")
+
+
 
 st.markdown(f"""
 <style>
@@ -240,8 +240,8 @@ st.markdown(f"""
         transition: all 0.4s ease !important;
         /* 3D/inset shading */
         box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.4), /* Dark shadow for top-left (depth) */
-                    inset -2px -2px 5px rgba(255, 255, 255, 0.1); /* Light shadow for bottom-right (highlight) */
-        caret-color: white !important; /*  FIX FOR WHITE CURSOR  */
+                            inset -2px -2px 5px rgba(255, 255, 255, 0.1); /* Light shadow for bottom-right (highlight) */
+        caret-color: white !important; /* FIX FOR WHITE CURSOR  */
     }}
 
     /* Fix for red border and enhanced 3D/glow on focus */
@@ -249,9 +249,9 @@ st.markdown(f"""
     .stTextInput > div > div > input:focus-visible, /* Target this specifically */
     .stTextInput > div > div > input:active {{ /* And this for good measure */
         border-color: rgba(64, 96, 64, 0.9) !important; /* Keeps the green border if you want it */
-        box-shadow: 0 0 30px rgba(255, 255, 255, 0.8), /*  FIX FOR WHITE OUTER GLOW ON FOCUS ✨ */
-                    inset 2px 2px 8px rgba(0, 0, 0, 0.6), /* Deeper dark inset */
-                    inset -2px -2px 8px rgba(255, 255, 255, 0.15) !important; /* Brighter light inset */
+        box-shadow: 0 0 30px rgba(255, 255, 255, 0.8), /* FIX FOR WHITE OUTER GLOW ON FOCUS ✨ */
+                            inset 2px 2px 8px rgba(0, 0, 0, 0.6), /* Deeper dark inset */
+                            inset -2px -2px 8px rgba(255, 255, 255, 0.15) !important; /* Brighter light inset */
         outline: none !important; /* Crucial for removing default outlines */
     }}
 
@@ -361,6 +361,8 @@ st.markdown(f"""
 </style>
 """, unsafe_allow_html=True)
 
+
+
 if logo_base64:
     st.markdown(f"""
         <div class="logo-container">
@@ -368,7 +370,9 @@ if logo_base64:
         </div>
     """, unsafe_allow_html=True)
 
+
 st.markdown('<div class="chat-container">', unsafe_allow_html=True)
+
 
 st.markdown(f"""
     <div class="chat-header">
@@ -376,7 +380,9 @@ st.markdown(f"""
     </div>
 """, unsafe_allow_html=True)
 
+
 st.markdown('<div class="messages-area">', unsafe_allow_html=True)
+
 
 if not st.session_state.conversation:
     st.markdown("""
@@ -395,9 +401,11 @@ else:
             </div>
         """, unsafe_allow_html=True)
 
-st.markdown('</div>', unsafe_allow_html=True)
+st.markdown('</div>', unsafe_allow_html=True) 
+
 
 st.markdown('<div class="input-container">', unsafe_allow_html=True)
+
 
 user_input = st.text_input(
     "Type your message",
@@ -406,89 +414,127 @@ user_input = st.text_input(
     label_visibility="collapsed"
 )
 
+
 send_button = st.button("Send", key="send_button_fixed")
 
 st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 if send_button or (user_input and user_input.strip() != "" and user_input != st.session_state.last_user_input_content):
     if user_input.strip() != "":
         timestamp = datetime.now().strftime("%I:%M %p")
 
-        # Add user message
+        
         st.session_state.conversation.append({
             "role": "user",
             "content": user_input,
             "timestamp": timestamp
         })
 
+        
         st.session_state.conversation.append({
             "role": "bot",
             "content": '<div class="typing-dots"><span></span><span></span><span></span></div>',
             "timestamp": datetime.now().strftime("%I:%M %p")
         })
 
+        
         st.session_state.input_key = str(uuid.uuid4())
-        st.session_state.last_user_input_content = ""
-        st.rerun()
+        st.session_state.last_user_input_content = user_input 
+        st.rerun() 
 
-if st.session_state.conversation and st.session_state.conversation[-1]["role"] == "bot" and '<div class="typing-dots">' in st.session_state.conversation[-1]["content"]:
-    user_msg = next((m["content"] for m in reversed(st.session_state.conversation) if m["role"] == "user"), "")
+
+if st.session_state.conversation and \
+   st.session_state.conversation[-1]["role"] == "bot" and \
+   '<div class="typing-dots">' in st.session_state.conversation[-1]["content"]:
+
+    
+    current_user_question = ""
+    if len(st.session_state.conversation) >= 2:
+        if st.session_state.conversation[-2]["role"] == "user":
+            current_user_question = st.session_state.conversation[-2]["content"]
+        else:
+            st.error("Error: Could not find last user message for bot response generation.")
+            current_user_question = "Tell me about Singapore government policies." 
 
     try:
-        search_results = vectorstore.similarity_search(user_msg, k=5)
+        
+        search_results = vectorstore.similarity_search(current_user_question, k=5)
         context = "\n".join([doc.page_content for doc in search_results])
 
+        
+        messages_for_llm = []
+
+        
+        system_instruction = """
+You are SingAI, a highly intelligent and helpful assistant specializing in Singapore government policies, including CPF, HDB, and other public policies.
+Your goal is to provide accurate, concise, and comprehensive answers.
+
+When responding:
+- **Prioritize the provided context** if it's relevant to the user's query.
+- If the query requires a **factual, concise answer**, provide it directly, including any relevant section numbers, rule numbers, or regulatory references from the context.
+- If the query requires an **elaborate discussion**, connect the provided context with other related topics, offering a comprehensive explanation.
+- If you **cannot find specific relevant information** in your knowledge base (the context), politely state that you may not have information on that specific topic or suggest the user try rephrasing their question. **Do not make up information.**
+- Maintain a polite, professional, and informative tone.
+"""
+        messages_for_llm.append({"role": "system", "content": system_instruction})
+
+
+        for msg in st.session_state.conversation[:-1]:
+            if '<div class="typing-dots">' not in msg["content"]: # Crucial to skip the placeholder
+                # Map internal roles to OpenAI API roles
+                role = "assistant" if msg["role"] == "bot" else msg["role"]
+                messages_for_llm.append({"role": role, "content": msg["content"]})
+
+        
         if not context.strip():
-            prompt = f"""
-You are a helpful assistant for Singapore government policies (CPF, HDB, Public Policy).
-The user asked: "{user_msg}"
-I could not find specific relevant information in my knowledge base for this query.
-Please respond politely, stating that you may not have information on this specific topic or suggesting they try rephrasing their question, while still being helpful within your domain. Do not make up information.
+            
+            final_user_prompt = f"""
+I couldn't find specific relevant information in my knowledge base for your question: '{current_user_question}'.
+Please respond based on your general knowledge as a Singapore government assistant, or state that you don't have information on this specific topic and suggest rephrasing.
             """
         else:
-            prompt = f"""
-You are a highly intelligent assistant capable of analyzing complex queries related to Singapore government policies (CPF, HDB, Public Policy). When you receive a question, first analyze it to determine whether it requires:
-
-1. A factual, concise answer (e.g., direct data or information based on the given context).
-2. An elaborate discussion (e.g., a broader explanation, making relations between various topics, or a detailed understanding of the subject).
-
-If the query requires an elaborate discussion, you should connect the context provided with other related topics, offering a comprehensive response. For example, if the query relates to housing rules in the context of the Factories Act or other regulations, you can reference the specific sections (e.g., Section 88 of the Factories Act) or any relevant reference numbers in your response. Discuss the topic thoroughly, but stay focused on answering the user's query.
-
-If the query only requires factual information, respond with precision and clarity based on the context, and ensure to include any relevant reference, such as section numbers, rule numbers, or regulatory references.
-
-If a section, rule, or reference number is mentioned in the context, make sure to incorporate it into your response to add credibility and clarity.
-
+            final_user_prompt = f"""
 Context:
 {context}
 
 Question:
-{user_msg}
+{current_user_question}
 
-Answer:
-"""
+Considering the above context and our previous conversation, please provide a comprehensive answer.
+            """
+        messages_for_llm.append({"role": "user", "content": final_user_prompt})
+
+
+        
         response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {"role": "system", "content": "You are a helpful assistant for Singapore government policies."},
-                {"role": "user", "content": prompt}
-            ],
-            max_tokens=1000,
-            temperature= 0.5
+            model="gpt-4o-mini", 
+            messages=messages_for_llm, 
+            max_tokens=1500, 
+            temperature=0.5 
         )
         answer = response.choices[0].message.content.strip()
+
     except Exception as e:
-        answer = f"⚠️ Error generating response: {str(e)} Please try again or rephrase your question."
+        answer = f"⚠️ An error occurred while generating a response: {str(e)}. Please try again or rephrase your question."
+        print(f"OpenAI API/Processing Error: {e}") 
 
-    if st.session_state.conversation and st.session_state.conversation[-1]["role"] == "bot" and '<div class="typing-dots">' in st.session_state.conversation[-1]["content"]:
-        st.session_state.conversation.pop()
+    
+    if st.session_state.conversation and \
+       st.session_state.conversation[-1]["role"] == "bot" and \
+       '<div class="typing-dots">' in st.session_state.conversation[-1]["content"]:
+        st.session_state.conversation.pop() 
 
+    
     st.session_state.conversation.append({
         "role": "bot",
         "content": answer,
         "timestamp": datetime.now().strftime("%I:%M %p")
     })
-    st.rerun()
+    st.rerun() 
+
+
 
 st.markdown("""
 <script>
@@ -498,3 +544,5 @@ st.markdown("""
     }
 </script>
 """, unsafe_allow_html=True)
+
+st.markdown('</div>', unsafe_allow_html=True) 
