@@ -5,13 +5,11 @@ from datetime import datetime
 import os
 from langchain_openai import OpenAIEmbeddings
 from langchain_pinecone import PineconeVectorStore
-from openai import OpenAI # Ensure this is imported
+from openai import OpenAI 
 import uuid
 
 
 client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
-
-
 
 embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
 vectorstore = PineconeVectorStore.from_existing_index(
@@ -460,7 +458,7 @@ if st.session_state.conversation and \
 
     try:
         
-        search_results = vectorstore.similarity_search(current_user_question, k=5)
+        search_results = vectorstore.similarity_search(current_user_question, k=3)
         context = "\n".join([doc.page_content for doc in search_results])
 
         
@@ -468,21 +466,19 @@ if st.session_state.conversation and \
 
         
         system_instruction = """
-You are SingAI, a highly intelligent, comprehensive, and helpful assistant specializing in Singapore government policies, including CPF, HDB, and other public policies.
-Your goal is to provide accurate, detailed, and easily digestible answers.
+You are SingAI, a highly intelligent and helpful assistant specializing in Singapore government policies, including CPF, HDB, and other public policies.
+Your goal is to provide accurate, concise, and comprehensive answers.
 
 When responding:
-- **Maintain strict conversational context.** For follow-up questions, especially generic requests like "explain in more details" or "tell me more," **always refer to and elaborate on the immediate preceding topic or calculation you were discussing.** Do NOT introduce new, unrelated topics or contexts unless the user explicitly shifts the subject.
-- **Structure your answers clearly** using headings, sub-sections, and bullet points where appropriate for readability and detail, similar to a comprehensive guide.
-- **Prioritize and integrate the provided context** if it's relevant to the user's query.
-- If specific figures are not provided by the user but are crucial for understanding, **provide realistic examples or estimates** to illustrate the calculation or concept, clearly stating that these are assumptions.
+- **Prioritize the provided context** if it's relevant to the user's query.
+- If the query requires a **factual, concise answer**, provide it directly, including any relevant section numbers, rule numbers, or regulatory references from the context.
 - If the query requires an **elaborate discussion**, connect the provided context with other related topics, offering a comprehensive explanation.
 - If you **cannot find specific relevant information** in your knowledge base (the context), politely state that you may not have information on that specific topic or suggest the user try rephrasing their question. **Do not make up information.**
 - Maintain a polite, professional, and informative tone.
-- **Crucially, after providing a comprehensive answer, always offer to elaborate further or answer specific follow-up questions.** For example, you can end by saying something like:
-    "Would you like me to elaborate on any specific deduction, explain the process of selling your HDB flat in more detail, or help with a more precise calculation if you provide additional figures?"
-    "Is there any specific part of this HDB flat sale process or another aspect of HDB/CPF policies you'd like to understand better?"
-    "Let me know if you have any other questions or need further clarification!"
+- **Crucially, after providing a comprehensive answer, always say to user whether the user have any queries or not.  For example- "Let me know if you have any other questions! Please dont use the same sentences all the time, paraphrase it.
+
+NOTE: If the user say Hi or Hello, you must greet them warmly and ask how you can assist them today. DOn't say anything about the context, if user say Hi.
+NOTE: If the user asks about any calculation, you must try to assume the missing variables and then calculate it accurately. After the answer, you will must say like this- if you provide me these(assumed) variables then I can calculate more accurately.
 """
         messages_for_llm.append({"role": "system", "content": system_instruction})
 
