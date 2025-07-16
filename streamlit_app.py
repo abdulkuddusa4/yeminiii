@@ -514,13 +514,13 @@ Considering the above context and our previous conversation, please provide a co
         response = client.chat.completions.create(
             model="gpt-4o-mini", 
             messages=messages_for_llm, 
-            max_tokens=1500, 
+            max_tokens=2000, 
             temperature=0.5 
         )
         answer = response.choices[0].message.content.strip()
 
     except Exception as e:
-        answer = f"⚠️ An error occurred while generating a response: {str(e)}. Please try again or rephrase your question."
+        answer = f" An error occurred while generating a response: {str(e)}. Please try again or rephrase your question."
         print(f"OpenAI API/Processing Error: {e}") 
 
     
